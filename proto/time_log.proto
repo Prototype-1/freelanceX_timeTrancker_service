@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package freelanceX.time_tracker;
+
+option go_package = "./proto;time_logpb";
+
+import "google/protobuf/timestamp.proto";
+
+service TimeLogService {
+  rpc CreateTimeLog(CreateTimeLogRequest) returns (CreateTimeLogResponse);
+  rpc GetTimeLogsByUser(GetTimeLogsByUserRequest) returns (TimeLogsResponse);
+  rpc GetTimeLogsByProject(GetTimeLogsByProjectRequest) returns (TimeLogsResponse);
+  rpc UpdateTimeLog(UpdateTimeLogRequest) returns (UpdateTimeLogResponse);
+  rpc DeleteTimeLog(DeleteTimeLogRequest) returns (DeleteTimeLogResponse);
+}
+
+enum TimeLogSource {
+  MANUAL = 0;
+  INTEGRATION = 1;
+}
+
+message CreateTimeLogRequest {
+  string user_id = 1;
+  string project_id = 2;
+  string task_name = 3;
+  google.protobuf.Timestamp start_time = 4;
+  google.protobuf.Timestamp end_time = 5;
+  TimeLogSource source = 6;
+}
+
+message CreateTimeLogResponse {
+  string log_id = 1;
+  double duration_hours = 2;
+}
+
+message GetTimeLogsByUserRequest {
+  string user_id = 1;
+  string project_id = 2; 
+  google.protobuf.Timestamp date_from = 3; 
+  google.protobuf.Timestamp date_to = 4;   
+}
+
+message GetTimeLogsByProjectRequest {
+  string project_id = 1;
+}
+
+message TimeLog {
+  string log_id = 1;
+  string user_id = 2;
+  string project_id = 3;
+  string task_name = 4;
+  google.protobuf.Timestamp start_time = 5;
+  google.protobuf.Timestamp end_time = 6;
+  double duration_hours = 7;
+  TimeLogSource source = 8;
+}
+
+message TimeLogsResponse {
+  repeated TimeLog logs = 1;
+}
+
+message UpdateTimeLogRequest {
+  string log_id = 1;
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp end_time = 3;
+}
+
+message UpdateTimeLogResponse {
+  string log_id = 1;
+  double duration_hours = 2;
+}
+
+message DeleteTimeLogRequest {
+  string log_id = 1;
+}
+
+message DeleteTimeLogResponse {
+  string log_id = 1;
+  string status = 2;
+}
