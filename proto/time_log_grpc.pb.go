@@ -29,6 +29,8 @@ const (
 // TimeLogServiceClient is the client API for TimeLogService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// === Service ===
 type TimeLogServiceClient interface {
 	CreateTimeLog(ctx context.Context, in *CreateTimeLogRequest, opts ...grpc.CallOption) (*CreateTimeLogResponse, error)
 	GetTimeLogsByUser(ctx context.Context, in *GetTimeLogsByUserRequest, opts ...grpc.CallOption) (*TimeLogsResponse, error)
@@ -98,6 +100,8 @@ func (c *timeLogServiceClient) DeleteTimeLog(ctx context.Context, in *DeleteTime
 // TimeLogServiceServer is the server API for TimeLogService service.
 // All implementations must embed UnimplementedTimeLogServiceServer
 // for forward compatibility.
+//
+// === Service ===
 type TimeLogServiceServer interface {
 	CreateTimeLog(context.Context, *CreateTimeLogRequest) (*CreateTimeLogResponse, error)
 	GetTimeLogsByUser(context.Context, *GetTimeLogsByUserRequest) (*TimeLogsResponse, error)

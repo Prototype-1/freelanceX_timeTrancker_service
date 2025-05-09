@@ -6,6 +6,7 @@ option go_package = "./proto;time_logpb";
 
 import "google/protobuf/timestamp.proto";
 
+// === Service ===
 service TimeLogService {
   rpc CreateTimeLog(CreateTimeLogRequest) returns (CreateTimeLogResponse);
   rpc GetTimeLogsByUser(GetTimeLogsByUserRequest) returns (TimeLogsResponse);
@@ -14,13 +15,23 @@ service TimeLogService {
   rpc DeleteTimeLog(DeleteTimeLogRequest) returns (DeleteTimeLogResponse);
 }
 
+// === Enums ===
 enum TimeLogSource {
   MANUAL = 0;
   INTEGRATION = 1;
 }
 
+enum UserRole {
+  UNKNOWN = 0;
+  FREELANCER = 1;
+  CLIENT = 2;
+  ADMIN = 3;
+}
+
+// === Requests & Responses ===
+
 message CreateTimeLogRequest {
-  string user_id = 1;
+  string user_id = 1; 
   string project_id = 2;
   string task_name = 3;
   google.protobuf.Timestamp start_time = 4;
@@ -35,13 +46,15 @@ message CreateTimeLogResponse {
 
 message GetTimeLogsByUserRequest {
   string user_id = 1;
-  string project_id = 2; 
-  google.protobuf.Timestamp date_from = 3; 
-  google.protobuf.Timestamp date_to = 4;   
+  string project_id = 2;  // optional filter by project
+  google.protobuf.Timestamp date_from = 3;
+  google.protobuf.Timestamp date_to = 4;
 }
 
 message GetTimeLogsByProjectRequest {
   string project_id = 1;
+  google.protobuf.Timestamp date_from = 2;
+  google.protobuf.Timestamp date_to = 3;
 }
 
 message TimeLog {
@@ -51,7 +64,7 @@ message TimeLog {
   string task_name = 4;
   google.protobuf.Timestamp start_time = 5;
   google.protobuf.Timestamp end_time = 6;
-  double duration_hours = 7;
+    int32 duration = 7;
   TimeLogSource source = 8;
 }
 
