@@ -58,8 +58,15 @@ func (s *timeLogService) CreateTimeLog(ctx context.Context, req *pb.CreateTimeLo
 	if extractRole(ctx) != "freelancer" {
 		return nil, status.Error(codes.PermissionDenied, "only freelancers can create time logs")
 	}
-
 	userID := extractUserID(ctx)
+
+	start := req.StartTime.AsTime()
+	end := req.EndTime.AsTime()
+	if end.Before(start) {
+		return nil, status.Error(codes.InvalidArgument, "end time cannot be before start time")
+	}
+
+	durationMinutes := int(end.Sub(start).Minutes())
 
 	log := &model.TimeLog{
 		ID:        uuid.New(),
@@ -68,6 +75,7 @@ func (s *timeLogService) CreateTimeLog(ctx context.Context, req *pb.CreateTimeLo
 		TaskName:  req.TaskName,
 		StartTime: req.StartTime.AsTime(),
 		EndTime:   req.EndTime.AsTime(),
+		Duration:  durationMinutes,
 		Source:    req.Source.String(),
 	}
 
