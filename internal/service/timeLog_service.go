@@ -112,11 +112,20 @@ if req.DateTo != nil {
     toTime = &t
 }
 
-logs, err := s.repo.GetTimeLogsByUser(uuid.MustParse(req.UserId), uuid.MustParse(req.ProjectId), fromTime, toTime)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "error retrieving logs: %v", err)
-	}
+userID, err := uuid.Parse(req.UserId)
+if err != nil {
+    return nil, status.Errorf(codes.InvalidArgument, "invalid user ID: %v", err)
+}
 
+projectID, err := uuid.Parse(req.ProjectId)
+if err != nil {
+    return nil, status.Errorf(codes.InvalidArgument, "invalid project ID: %v", err)
+}
+
+logs, err := s.repo.GetTimeLogsByUser(userID, projectID, fromTime, toTime)
+if err != nil {
+    return nil, status.Errorf(codes.Internal, "error retrieving logs: %v", err)
+}
 	return &pb.TimeLogsResponse{Logs: toResponseLogs(logs)}, nil
 }
 
