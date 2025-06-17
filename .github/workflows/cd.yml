@@ -1,0 +1,43 @@
+name: CD - Deploy Time Tracker Service to GKE
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Get GKE credentials
+      uses: google-github-actions/get-gke-credentials@v2
+      with:
+        cluster_name: freelancex-cluster
+        location: asia-south1-a
+        project_id: freelancex-463106
+
+    - name: Create/Update K8s secret for time-tracker-service
+      run: |
+        kubectl create secret generic time-tracker-service-secret \
+          --from-literal=DB_HOST="${{ secrets.DB_HOST }}" \
+          --from-literal=DB_PORT="${{ secrets.DB_PORT }}" \
+          --from-literal=DB_USER="${{ secrets.DB_USER }}" \
+          --from-literal=DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+          --from-literal=DB_NAME="${{ secrets.DB_NAME }}" \
+          --from-literal=PORT="${{ secrets.PORT }}" \
+          --dry-run=client -o yaml | kubectl apply -f -
+
+    - name: Deploy Kubernetes Resources
+      run: |
+        kubectl apply -f k8s/time-tracker-service/deployment.yaml
+        kubectl apply -f k8s/time-tracker-service/service.yaml
