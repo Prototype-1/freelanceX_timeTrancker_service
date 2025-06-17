@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: time-tracker-service
+  labels:
+    app: time-tracker-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: time-tracker-service
+  template:
+    metadata:
+      labels:
+        app: time-tracker-service
+    spec:
+      containers:
+        - name: time-tracker-service
+          image: aswinputhukaatil/freelancex_time_tracker_service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 50054
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: time-tracker-service-secret
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: time-tracker-service-secret
+                  key: DB_PORT
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: time-tracker-service-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: time-tracker-service-secret
+                  key: DB_PASSWORD
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: time-tracker-service-secret
+                  key: DB_NAME
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: time-tracker-service-secret
+                  key: PORT
