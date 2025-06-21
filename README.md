@@ -9,19 +9,6 @@ A MVP service where freelancer can manage their working hours in minutes using g
 - PostgreSQL
 - Protocol Buffers
 
-## Folder Structure
-
-.
-├── config/
-├── handler/
-├── model/
-├── proto/
-├── repository/
-├── service/
-├── main.go
-└── go.mod
-
-
 ## Setup
 
 ### 1. Clone & Navigate
