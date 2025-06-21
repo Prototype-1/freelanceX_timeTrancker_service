@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package project;
+
+option go_package = "./crm_service";
+
+import "google/protobuf/timestamp.proto";
+
+service ProjectService {
+  rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
+  rpc GetProjectsByUser(GetProjectsByUserRequest) returns (GetProjectsByUserResponse);
+  rpc GetProjectById(GetProjectByIdRequest) returns (GetProjectByIdResponse);
+  rpc DiscoverProjects(DiscoverProjectsRequest) returns (DiscoverProjectsResponse);
+  rpc AssignFreelancer(AssignFreelancerRequest) returns (AssignFreelancerResponse);
+  rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse);
+  rpc DeleteProject(DeleteProjectRequest) returns (DeleteProjectResponse);
+}
+
+// --- Messages ---
+
+message CreateProjectRequest {
+  string client_id = 1;
+  string project_name = 2;
+  string description = 3;
+  google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp end_date = 5;
+  repeated string required_skills = 6;
+  int32 min_experience = 7;
+  repeated string required_languages = 8;
+}
+
+message CreateProjectResponse {
+  string project_id = 1;
+  string status = 2;
+}
+
+message GetProjectsByUserRequest {
+  string user_id = 1;
+}
+
+message ProjectSummary {
+  string project_id = 1;
+  string project_name = 2;
+  string role = 3; 
+  google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp end_date = 5;
+}
+
+message GetProjectsByUserResponse {
+  repeated ProjectSummary projects = 1;
+}
+
+message GetProjectByIdRequest {
+  string project_id = 1;
+}
+
+message FreelancerInfo {
+  string user_id = 1;
+  string name = 2;
+}
+
+message GetProjectByIdResponse {
+  string project_id = 1;
+  string project_name = 2;
+  string description = 3;
+  string client_id = 4;
+  repeated FreelancerInfo assigned_freelancers = 5;
+  google.protobuf.Timestamp start_date = 6;
+  google.protobuf.Timestamp end_date = 7;
+}
+
+message DiscoverProjectsRequest {
+  string user_id = 1;
+}
+
+message DiscoverProject {
+  string project_id = 1;
+  string project_name = 2;
+  string description = 3;
+  string client_id = 4;
+  google.protobuf.Timestamp start_date = 5;
+  google.protobuf.Timestamp end_date = 6;
+}
+
+message DiscoverProjectsResponse {
+  repeated DiscoverProject projects = 1;
+}
+
+message AssignFreelancerRequest {
+  string project_id = 1;
+  string freelancer_id = 2;
+}
+
+message AssignFreelancerResponse {
+  string project_id = 1;
+  string freelancer_id = 2;
+  string status = 3;
+}
+
+message UpdateProjectRequest {
+  string project_id = 1;
+  string project_name = 2;
+  string description = 3;
+  google.protobuf.Timestamp end_date = 4;
+  repeated string required_skills = 5;
+  int32 min_experience = 6;
+  repeated string required_languages = 7;
+}
+
+message UpdateProjectResponse {
+  string project_id = 1;
+  string status = 2;
+}
+
+message DeleteProjectRequest {
+  string project_id = 1;
+}
+
+message DeleteProjectResponse {
+  string project_id = 1;
+  string status = 2;
+}

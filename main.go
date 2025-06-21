@@ -11,10 +11,12 @@ import (
 	"github.com/Prototype-1/freelanceX_timeTrancker_service/internal/service"
 	"github.com/Prototype-1/freelanceX_timeTrancker_service/internal/model"
 	"github.com/Prototype-1/freelanceX_timeTrancker_service/config" 
+	"github.com/Prototype-1/freelanceX_timeTrancker_service/client"
 )
 
 func main() {
 	cfg := config.LoadConfig()
+	client.InitProjectServiceClient()
 
 	db, err := gorm.Open(postgres.Open(cfg.DatabaseDSN), &gorm.Config{})
 	if err != nil {
@@ -26,7 +28,7 @@ func main() {
 	}
 
 	repo := repository.NewTimeLogRepository(db)
-	svc := service.NewTimeLogService(repo)
+	svc := service.NewTimeLogService(repo, client.ProjectClient)
 
 	listener, err := net.Listen("tcp", cfg.ServerPort)
 	if err != nil {

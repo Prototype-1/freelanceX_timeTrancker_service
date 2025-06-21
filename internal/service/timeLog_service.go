@@ -11,6 +11,7 @@ pb "github.com/Prototype-1/freelanceX_timeTrancker_service/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	projectpb "github.com/Prototype-1/freelanceX_timeTrancker_service/proto/crm_service"
 )
 
 type TimeLogService interface {
@@ -23,11 +24,12 @@ type TimeLogService interface {
 
 type timeLogService struct {
 	repo repository.TimeLogRepository
+	projectClient projectpb.ProjectServiceClient
 	pb.UnimplementedTimeLogServiceServer  
 }
 
-func NewTimeLogService(repo repository.TimeLogRepository) pb.TimeLogServiceServer {
-	return &timeLogService{repo: repo}
+func NewTimeLogService(repo repository.TimeLogRepository, projectClient projectpb.ProjectServiceClient) pb.TimeLogServiceServer {
+	return &timeLogService{repo: repo, projectClient: projectClient}
 }
 
 func extractRole(ctx context.Context) string {
@@ -66,18 +68,30 @@ func (s *timeLogService) CreateTimeLog(ctx context.Context, req *pb.CreateTimeLo
 		return nil, status.Error(codes.InvalidArgument, "end time cannot be before start time")
 	}
 
+	projectID, err := uuid.Parse(req.ProjectId)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid project ID format")
+	}
+	_, err = s.projectClient.GetProjectById(ctx, &projectpb.GetProjectByIdRequest{
+		ProjectId: req.ProjectId,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "project ID not found: %v", err)
+	}
+
 	durationMinutes := int(end.Sub(start).Minutes())
 
 	log := &model.TimeLog{
 		ID:        uuid.New(),
 		UserID:    uuid.MustParse(userID),
-		ProjectID: uuid.MustParse(req.ProjectId),
+		ProjectID: projectID,
 		TaskName:  req.TaskName,
 		StartTime: req.StartTime.AsTime(),
 		EndTime:   req.EndTime.AsTime(),
 		Duration:  durationMinutes,
 		Source:    req.Source.String(),
 	}
+	
 
 	createdLog, err := s.repo.CreateTimeLog(log)
 	if err != nil {
