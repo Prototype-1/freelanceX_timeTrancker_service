@@ -52,4 +52,4 @@ spec:
                   name: time-tracker-service-secret
                   key: PORT
             - name: PROJECT_SERVICE_GRPC_ADDR  
-              value: freelancex_crm_service.default.svc.cluster.local:50053
+              value: crm-service.default.svc.cluster.local:50053
