@@ -60,7 +60,6 @@ func (s *timeLogService) CreateTimeLog(ctx context.Context, req *pb.CreateTimeLo
 	if extractRole(ctx) != "freelancer" {
 		return nil, status.Error(codes.PermissionDenied, "only freelancers can create time logs")
 	}
-	userID := extractUserID(ctx)
 
 	start := req.StartTime.AsTime()
 	end := req.EndTime.AsTime()
@@ -72,7 +71,15 @@ func (s *timeLogService) CreateTimeLog(ctx context.Context, req *pb.CreateTimeLo
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid project ID format")
 	}
-	_, err = s.projectClient.GetProjectById(ctx, &projectpb.GetProjectByIdRequest{
+
+	role := extractRole(ctx)
+	userID := extractUserID(ctx)
+
+outgoingCtx := metadata.NewOutgoingContext(ctx, metadata.New(map[string]string{
+	"role":    role,
+	"user_id": userID,
+}))
+	_, err = s.projectClient.GetProjectById(outgoingCtx, &projectpb.GetProjectByIdRequest{
 		ProjectId: req.ProjectId,
 	})
 	if err != nil {
